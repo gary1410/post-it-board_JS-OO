@@ -1,21 +1,27 @@
-var Board = function( selector ) {
-  // Your board related code goes here
-  
-  // Use $elem to access the DOM element for this board
-  var $elem = $( selector );
-  
-  function initialize() {
-    // What needs to happen when this object is created?
-  };
+var Board = function($el) {
+  this.$el = $el;
+  this.$el.on('click', this.newPostIt.bind(this));
+}
 
-  initialize();
-};
+Board.prototype.newPostIt = function(e) {
+  var postIt = new PostIt({top: e.clientY, left: e.clientX});
+  this.$el.append(postIt.$el)
+}
 
-var PostIt = function() {
-  // Your post-it related code goes here
-};
+var PostIt = function(position){
+  this.$el = $("#templates > .post-it").clone().css(position);
+  this.$el.on('click', function($event){
+    $event.stopPropagation()
+  })
+  this.$el.find('a.delete').on('click', this.remove.bind(this));
+  this.$el.draggable({ handle: '.header'});
+}
 
-$(function() {
-  // This code will run when the DOM has finished loading
-  Board.new('#board');
+PostIt.prototype.remove = function(e) {
+  e.stopPropagation();
+  this.$el.remove();
+}
+
+$(document).ready(function() {
+  var board = new Board($('#board'));
 });
